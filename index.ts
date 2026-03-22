@@ -1,7 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
 import { query } from "@anthropic-ai/claude-agent-sdk";
 import { resolve } from "path";
-import { readFileSync, existsSync } from "fs";
 
 // --- Config ---
 const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
@@ -18,19 +17,19 @@ const ALLOWED_USERS = new Set(
     .map(Number)
 );
 
-const HOME = process.env.HOME || "/Users/maestrobot";
-const CLAUDE_EXECUTABLE = resolve(HOME, ".local/bin/claude");
-const SESSION_HOME = resolve(HOME, "claudeCodeTelegram");
+const HOME = process.env.HOME || "";
+const CLAUDE_EXECUTABLE = process.env.CLAUDE_EXECUTABLE || resolve(HOME, ".local/bin/claude");
+const SESSION_HOME = process.env.SESSION_HOME || process.cwd();
 
-const SYSTEM_PROMPT = `You are a developer assistant for the claudeCodeTelegram project.
+const SYSTEM_PROMPT = process.env.SYSTEM_PROMPT || `You are a developer assistant.
 Your working directory is ${SESSION_HOME}.
 You can read, modify, and run code in this project.
-Respond in the user's language (default: Korean).
+Respond in the user's language.
 
-Key commands:
-- bun run bot — run the telegram bot
-- bun run dev — run the next.js dev server
-- bun install — install dependencies
+## Process management
+- Use pm2 to manage long-running processes
+- pm2 start "<command>" --name <name> --cwd ${SESSION_HOME}
+- pm2 restart/stop/logs <name>
 
 Be concise and direct. Execute tasks immediately without unnecessary confirmation.`;
 

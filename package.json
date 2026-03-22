@@ -3,7 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "bun run index.ts"
+    "start": "bun run index.ts",
+    "pm2:start": "pm2 start ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop claude-boot",
+    "pm2:restart": "pm2 restart claude-boot",
+    "pm2:logs": "pm2 logs claude-boot",
+    "pm2:status": "pm2 status claude-boot"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.74",
