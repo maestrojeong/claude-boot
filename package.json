@@ -1,0 +1,17 @@
+{
+  "name": "claude-boot",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "bun run index.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.2.74",
+    "node-telegram-bot-api": "^0.67.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/node-telegram-bot-api": "^0.64.14",
+    "typescript": "^5"
+  }
+}
