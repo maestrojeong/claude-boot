@@ -43,6 +43,22 @@ console.log(`claude-boot started. cwd: ${SESSION_HOME}`);
 // --- Active queries (per user abort control) ---
 const activeQueries = new Map<number, { aborted: boolean }>();
 
+// --- Polling error handler ---
+bot.on("polling_error", async (err: any) => {
+  const statusCode = err?.response?.statusCode;
+  console.warn(`[polling_error] code=${err?.code} status=${statusCode} msg=${err?.message}`);
+
+  if (statusCode === 429) {
+    const retryAfter = (Number(err?.response?.body?.parameters?.retry_after) || 10) + 10;
+    console.warn(`[polling] 429 rate limit — stopping polling, waiting ${retryAfter}s`);
+    await bot.stopPolling();
+    await new Promise((r) => setTimeout(r, retryAfter * 1000));
+    console.info("[polling] resuming after rate limit wait");
+    await bot.startPolling();
+  }
+  // 5xx 등 나머지는 라이브러리가 자동 재시도하므로 로그만
+});
+
 // --- Message handler (DM only) ---
 bot.on("message", async (msg) => {
   if (msg.chat.type !== "private") return;
