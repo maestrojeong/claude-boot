@@ -9,6 +9,9 @@ module.exports = {
       interpreter: resolve(HOME, ".bun/bin/bun"),
       cwd: __dirname,
       env_file: ".env",
+      env: {
+        SESSION_HOME: resolve(HOME, "claudeCodeTelegram"),
+      },
       watch: false,
       autorestart: true,
       max_restarts: 10,

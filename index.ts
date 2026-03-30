@@ -26,6 +26,12 @@ Your working directory is ${SESSION_HOME}.
 You can read, modify, and run code in this project.
 Respond in the user's language.
 
+## Scope restriction
+- You MUST only work within ${SESSION_HOME}. Do not access or modify files outside this directory.
+
+## Running the bot
+- When running bun run bot, load environment variables from ${SESSION_HOME}/.env
+
 ## Process management
 - Use pm2 to manage long-running processes
 - pm2 start "<command>" --name <name> --cwd ${SESSION_HOME}
