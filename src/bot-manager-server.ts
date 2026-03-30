@@ -4,9 +4,11 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { readFileSync, writeFileSync } from "fs";
 import { execSync } from "child_process";
+import { homedir } from "os";
 
-const ENV_PATH = "/Users/maestrobot/claudeCodeTelegram/.env";
-const BOT_CWD = "/Users/maestrobot/claudeCodeTelegram";
+const HOME = homedir();
+const ENV_PATH = `${HOME}/claudeCodeTelegram/.env`;
+const BOT_CWD = `${HOME}/claudeCodeTelegram`;
 
 function readEnv(): Record<string, string> {
   const content = readFileSync(ENV_PATH, "utf-8");
@@ -59,11 +61,13 @@ function setAllowedUsers(users: string[]) {
 }
 
 function restartBot() {
+  const env = readEnv();
+  const unsetArgs = Object.keys(env).map(k => `-u ${k}`).join(" ");
   try {
     execSync("pm2 delete claudeCodeTelegram", { stdio: "pipe" });
   } catch {}
   execSync(
-    `pm2 start "env -u TELEGRAM_ALLOWED_USERS -u TELEGRAM_BOT_TOKEN bun run bot" --name claudeCodeTelegram --cwd ${BOT_CWD}`,
+    `pm2 start "env ${unsetArgs} bun run bot" --name claudeCodeTelegram --cwd ${BOT_CWD}`,
     { stdio: "pipe" }
   );
 }
