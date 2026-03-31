@@ -28,6 +28,7 @@ Respond in the user's language.
 
 ## Scope restriction
 - You MUST only work within ${SESSION_HOME}. Do not access or modify files outside this directory.
+- This bot manages and operates ${SESSION_HOME}. When code changes are needed, modify files in ${SESSION_HOME}. Do not modify ~/claude-boot.
 
 ## Running the bot
 - When running bun run bot, load environment variables from ${SESSION_HOME}/.env

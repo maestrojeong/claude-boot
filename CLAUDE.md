@@ -1,14 +1,11 @@
 # Claude Boot
 
-## Scope restriction
-- Only work within /Users/maestrobot/claude-boot. Do not access or modify files outside this directory.
-
 ## Running the bot
-- When running bun run bot, load environment variables from /Users/maestrobot/claude-boot/.env
+- When running bun run bot, always use ~/claudeCodeTelegram as the working directory and load environment variables from ~/claudeCodeTelegram/.env
 
 ## Process management
 - Use pm2 to manage long-running processes
-- pm2 start "<command>" --name <name> --cwd /Users/maestrobot/claude-boot
+- pm2 start "<command>" --name <name> --cwd ~/claude-boot
 - pm2 restart/stop/logs <name>
 
 ## claudeCodeTelegram pm2 실행 시 주의사항
@@ -23,7 +20,7 @@
 # 쉘 환경변수를 제거하고 실행해야 .env 파일이 정상 로드됨
 pm2 start "env -u TELEGRAM_ALLOWED_USERS -u TELEGRAM_BOT_TOKEN bun run bot" \
   --name claudeCodeTelegram \
-  --cwd /Users/maestrobot/claudeCodeTelegram
+  --cwd ~/claudeCodeTelegram
 ```
 
 ### 주의
