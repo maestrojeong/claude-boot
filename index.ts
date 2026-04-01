@@ -129,6 +129,40 @@ bot.on("message", async (msg) => {
 
     let finalResponse = "";
     let newSessionId: string | null = null;
+    let textBuffer = "";
+    let toolStatusMsgId: number | null = null;
+    let anySentText = false;
+    let pendingToolName: string | null = null;
+    let pendingToolInput = "";
+
+    async function showToolStatus(label: string) {
+      try {
+        if (toolStatusMsgId) {
+          await bot.editMessageText(label, { chat_id: chatId, message_id: toolStatusMsgId } as any);
+        } else {
+          const sent = await bot.sendMessage(chatId, label);
+          toolStatusMsgId = sent.message_id;
+        }
+      } catch {}
+    }
+
+    async function clearToolStatus() {
+      if (!toolStatusMsgId) return;
+      const id = toolStatusMsgId;
+      toolStatusMsgId = null;
+      try { await bot.deleteMessage(chatId, id); } catch {}
+    }
+
+    async function flushText() {
+      if (!textBuffer.trim()) return;
+      const toSend = textBuffer.trim();
+      textBuffer = "";
+      await clearToolStatus();
+      for (const chunk of splitMessage(toSend)) {
+        await bot.sendMessage(chatId, chunk);
+      }
+      anySentText = true;
+    }
 
     for await (const message of query({
       prompt: text,
@@ -136,17 +170,61 @@ bot.on("message", async (msg) => {
     })) {
       if (control.aborted) break;
 
-      const msgType = "type" in message ? (message as any).type : undefined;
-      const msgSubtype = "subtype" in message ? (message as any).subtype : undefined;
+      const msgType = (message as any).type;
+      const msgSubtype = (message as any).subtype;
 
       // Capture session ID
       if (msgType === "system" && msgSubtype === "init") {
         newSessionId = (message as any).session_id;
+        continue;
       }
 
-      // Capture result
-      if ("result" in message) {
+      // Stream events (tool_use detection + text_delta)
+      if (msgType === "stream_event") {
+        const evt = (message as any).event;
+        if (!evt) continue;
+
+        if (evt.type === "content_block_start" && evt.content_block?.type === "tool_use") {
+          pendingToolName = evt.content_block.name ?? null;
+          pendingToolInput = "";
+        }
+
+        if (evt.type === "content_block_delta") {
+          if (evt.delta?.type === "input_json_delta" && evt.delta?.partial_json) {
+            pendingToolInput += evt.delta.partial_json;
+          }
+          if (evt.delta?.type === "text_delta" && evt.delta?.text) {
+            textBuffer += evt.delta.text;
+          }
+        }
+
+        if (evt.type === "content_block_stop" && pendingToolName) {
+          let parsedInput: Record<string, unknown> = {};
+          try { if (pendingToolInput) parsedInput = JSON.parse(pendingToolInput); } catch {}
+          await flushText();
+          await showToolStatus(`🔧 ${formatToolUse(pendingToolName, parsedInput)}`);
+          pendingToolName = null;
+          pendingToolInput = "";
+        }
+        continue;
+      }
+
+      // Tool use summary → permanent
+      if (msgType === "tool_use_summary") {
+        const summary = (message as any).summary as string;
+        await clearToolStatus();
+        for (const chunk of splitMessage(summary)) {
+          await bot.sendMessage(chatId, chunk);
+        }
+        anySentText = true;
+        continue;
+      }
+
+      // Final result
+      if (msgType === "result") {
         finalResponse = (message as any).result || "";
+        await clearToolStatus();
+        continue;
       }
     }
 
@@ -154,12 +232,17 @@ bot.on("message", async (msg) => {
       sessions.set(userId, newSessionId);
     }
 
-    if (finalResponse && !control.aborted) {
-      for (const chunk of splitMessage(finalResponse)) {
-        await bot.sendMessage(chatId, chunk);
+    if (!control.aborted) {
+      await flushText();
+      if (!anySentText) {
+        if (finalResponse) {
+          for (const chunk of splitMessage(finalResponse)) {
+            await bot.sendMessage(chatId, chunk);
+          }
+        } else {
+          await bot.sendMessage(chatId, "(no response)");
+        }
       }
-    } else if (!control.aborted) {
-      await bot.sendMessage(chatId, "(no response)");
     }
   } catch (err) {
     if (!control.aborted) {
@@ -184,6 +267,18 @@ process.on("SIGTERM", () => {
   bot.stopPolling();
   process.exit(0);
 });
+
+function formatToolUse(name: string, input: Record<string, unknown>): string {
+  let detail = "";
+  if (input.command) detail = String(input.command);
+  else if (input.file_path || input.path) detail = String(input.file_path || input.path);
+  else if (input.url) detail = String(input.url);
+  else if (input.pattern) detail = String(input.pattern);
+  else if (input.query || input.text) detail = String(input.query || input.text);
+  else if (input.content) detail = String(input.content).slice(0, 80);
+  if (detail) return `${name}(${detail.length > 100 ? detail.slice(0, 100) + "..." : detail})`;
+  return name;
+}
 
 function splitMessage(text: string, maxLen = 4096): string[] {
   if (text.length <= maxLen) return [text];
