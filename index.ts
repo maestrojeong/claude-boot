@@ -80,16 +80,10 @@ bot.on("message", async (msg) => {
   const text = msg.text || msg.caption || "";
   if (!text) return;
 
-  // /start
-  if (text === "/start") {
-    await bot.sendMessage(chatId, `claude-boot ready.\ncwd: ${SESSION_HOME}\n\nSend any message to interact with Claude.`);
-    return;
-  }
-
-  // /reset — clear session
-  if (text === "/reset") {
+  // /new — clear session
+  if (text === "/new") {
     sessions.delete(userId);
-    await bot.sendMessage(chatId, "Session reset.");
+    await bot.sendMessage(chatId, `claude-boot ready.\ncwd: ${SESSION_HOME}\n\nSend any message to interact with Claude.`);
     return;
   }
 
