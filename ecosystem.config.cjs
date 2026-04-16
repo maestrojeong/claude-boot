@@ -10,7 +10,7 @@ module.exports = {
       cwd: __dirname,
       env_file: ".env",
       env: {
-        SESSION_HOME: resolve(HOME, "claudeCodeTelegram"),
+        SESSION_HOME: resolve(HOME, "clawgram"),
       },
       watch: false,
       autorestart: true,

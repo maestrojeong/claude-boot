@@ -7,8 +7,8 @@ import { execSync } from "child_process";
 import { homedir } from "os";
 
 const HOME = homedir();
-const ENV_PATH = `${HOME}/claudeCodeTelegram/.env`;
-const BOT_CWD = `${HOME}/claudeCodeTelegram`;
+const ENV_PATH = `${HOME}/clawgram/.env`;
+const BOT_CWD = `${HOME}/clawgram`;
 
 function readEnv(): Record<string, string> {
   const content = readFileSync(ENV_PATH, "utf-8");
@@ -64,10 +64,10 @@ function restartBot() {
   const env = readEnv();
   const unsetArgs = Object.keys(env).map(k => `-u ${k}`).join(" ");
   try {
-    execSync("pm2 delete claudeCodeTelegram", { stdio: "pipe" });
+    execSync("pm2 delete clawgram", { stdio: "pipe" });
   } catch {}
   execSync(
-    `pm2 start "env ${unsetArgs} bun run bot" --name claudeCodeTelegram --cwd ${BOT_CWD}`,
+    `pm2 start "env ${unsetArgs} bun run bot" --name clawgram --cwd ${BOT_CWD}`,
     { stdio: "pipe" }
   );
 }
@@ -76,7 +76,7 @@ const server = new McpServer({ name: "bot-manager", version: "1.0.0" });
 
 server.tool(
   "list_users",
-  "List all allowed Telegram user IDs for claudeCodeTelegram",
+  "List all allowed Telegram user IDs for clawgram",
   {},
   async () => {
     const users = getAllowedUsers();
@@ -120,7 +120,7 @@ server.tool(
 
 server.tool(
   "restart_bot",
-  "Restart claudeCodeTelegram safely (env -u method to ensure .env is loaded correctly)",
+  "Restart clawgram safely (env -u method to ensure .env is loaded correctly)",
   {},
   async () => {
     restartBot();

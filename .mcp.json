@@ -2,8 +2,8 @@
   "mcpServers": {
     "bot-manager": {
       "command": "bun",
-      "args": ["run", "~/claude-boot/src/bot-manager-server.ts"],
-      "cwd": "~/claude-boot"
+      "args": ["run", "/Users/maestrobot/claude-boot/src/bot-manager-server.ts"],
+      "cwd": "/Users/maestrobot/claude-boot"
     }
   }
 }

@@ -1,14 +1,14 @@
 # Claude Boot
 
 ## Running the bot
-- When running bun run bot, always use ~/claudeCodeTelegram as the working directory and load environment variables from ~/claudeCodeTelegram/.env
+- When running bun run bot, always use ~/clawgram as the working directory and load environment variables from ~/clawgram/.env
 
 ## Process management
 - Use pm2 to manage long-running processes
 - pm2 start "<command>" --name <name> --cwd ~/claude-boot
 - pm2 restart/stop/logs <name>
 
-## claudeCodeTelegram pm2 실행 시 주의사항
+## clawgram pm2 실행 시 주의사항
 
 ### .env 우선순위 문제
 - bun은 쉘 환경변수가 이미 존재하면 `.env` 파일 값을 **덮어쓰지 않음**
@@ -19,8 +19,8 @@
 ```bash
 # 쉘 환경변수를 제거하고 실행해야 .env 파일이 정상 로드됨
 pm2 start "env -u TELEGRAM_ALLOWED_USERS -u TELEGRAM_BOT_TOKEN bun run bot" \
-  --name claudeCodeTelegram \
-  --cwd ~/claudeCodeTelegram
+  --name clawgram \
+  --cwd ~/clawgram
 ```
 
 ### 주의
