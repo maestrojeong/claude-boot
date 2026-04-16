@@ -12,13 +12,13 @@
 
 ### .env 우선순위 문제
 - bun은 쉘 환경변수가 이미 존재하면 `.env` 파일 값을 **덮어쓰지 않음**
-- 이 맥미니에 `TELEGRAM_ALLOWED_USERS`, `TELEGRAM_BOT_TOKEN` 등이 쉘 환경에 남아있을 수 있음
+- 이 맥미니에 `TELEGRAM_ALLOWED_USERS`, `TELEGRAM_BOOT_BOT_TOKEN` 등이 쉘 환경에 남아있을 수 있음
 - pm2는 실행 시 현재 쉘 환경변수를 그대로 상속하므로, `.env` 파일이 무시될 수 있음
 
 ### 올바른 pm2 실행 방법
 ```bash
 # 쉘 환경변수를 제거하고 실행해야 .env 파일이 정상 로드됨
-pm2 start "env -u TELEGRAM_ALLOWED_USERS -u TELEGRAM_BOT_TOKEN bun run bot" \
+pm2 start "env -u TELEGRAM_ALLOWED_USERS -u TELEGRAM_BOOT_BOT_TOKEN bun run bot" \
   --name clawgram \
   --cwd ~/clawgram
 ```

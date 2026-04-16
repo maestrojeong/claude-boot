@@ -3,9 +3,9 @@ import { query } from "@anthropic-ai/claude-agent-sdk";
 import { resolve } from "path";
 
 // --- Config ---
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TOKEN = process.env.TELEGRAM_BOOT_BOT_TOKEN;
 if (!TOKEN) {
-  console.error("TELEGRAM_BOT_TOKEN not set");
+  console.error("TELEGRAM_BOOT_BOT_TOKEN not set");
   process.exit(1);
 }
 
